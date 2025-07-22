@@ -1,0 +1,20 @@
+Screen {
+    layout: vertical;
+    background: black;
+}
+
+MapWidget {
+    height: 60%;
+    border: round green;
+    background: #111111;
+    color: #00ff00;
+    padding: 1;
+}
+
+#log {
+    height: 40%;
+    border: round blue;
+    background: #000022;
+    color: white;
+    padding: 1;
+}

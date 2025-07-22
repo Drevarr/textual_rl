@@ -27,11 +27,10 @@ class Engine:
         dest_x = self.player.x + dx
         dest_y = self.player.y + dy
 
-        # Prevent movement into non-walkable tiles (like walls)
         if self.game_map.is_walkable(dest_x, dest_y):
             self.player.move(dx, dy)
+            return "moved"
         else:
-            # Optionally: log blocked movement (requires a logger or callback)
-            print(f"Blocked: ({dest_x}, {dest_y}) is not walkable.")
+            return "blocked"
 
         return True

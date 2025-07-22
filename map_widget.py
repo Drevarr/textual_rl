@@ -15,10 +15,25 @@ class MapWidget(Static):
 
     def on_key(self, event: events.Key) -> None:
         key = event.key
-        if not self.engine.handle_input(key):
+        result = self.engine.handle_input(key)
+
+        if result == "exit":
             self.app.exit()
+            return
+
         self.refresh()
-        self.app.log_action("movement", f"{self.engine.player.name} moved to ({self.engine.player.x}, {self.engine.player.y})")
+
+        if result == "moved":
+            self.app.log_action(
+                "movement",
+                f"{self.engine.player.name} moved to ({self.engine.player.x}, {self.engine.player.y})"
+            )
+        elif result == "blocked":
+            self.app.log_action(
+                "blocked",
+                f"{self.engine.player.name} bumps into a wall!"
+            )
+
 
     def render(self) -> Text:
         text = Text()

@@ -11,7 +11,7 @@ class RoguelikeApp(App):
     CSS_PATH = "ui/styles.tcss"
 
     def compose(self) -> ComposeResult:
-        game_map = GameMap(40, 20)
+        game_map = GameMap(40, 18)
         player = Entity(x=20, y=8, char='@', name='Player', color='green')
         enemy = Entity(x=15, y=11, char='E', name='Enemy', color='red')
 

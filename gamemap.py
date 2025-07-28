@@ -1,6 +1,7 @@
 import numpy as np
 import networkx as nx
 import random
+from textual import events
 
 class GameMap:
     def __init__(self, width: int, height: int):
@@ -11,8 +12,8 @@ class GameMap:
         self.tiles = np.zeros((height, width), dtype=np.uint8)
 
         # Add test wall structure (you can change these)
-        self.tiles[5:15, 10] = 1   # vertical wall
-        self.tiles[10, 10:30] = 1  # horizontal wall
+        #self.tiles[5:15, 10] = 1   # vertical wall
+        #self.tiles[10, 10:30] = 1  # horizontal wall
 
         # Walkable where tile is 0 (floor)
         self.walkable = self.tiles == 0

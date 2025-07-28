@@ -13,8 +13,8 @@ MapWidget {
 
 #log {
     height: 40%;
-    border: round blue;
-    background: #000022;
+    border: round green;
+    background: #111111;
     color: white;
     padding: 1;
 }

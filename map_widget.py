@@ -9,6 +9,8 @@ class MapWidget(Static):
         super().__init__()
         self.engine = engine
         self.can_focus = True
+        self.viewport_width = 80
+        self.viewport_height = 20
 
     def on_mount(self) -> None:
         self.focus()
@@ -34,25 +36,56 @@ class MapWidget(Static):
                 f"{self.engine.player.name} bumps into a wall!"
             )
 
+    def get_viewport_bounds(self) -> tuple[int, int, int, int]:
+        px, py = self.engine.player.x, self.engine.player.y
+        w, h = self.viewport_width, self.viewport_height
+        gm = self.engine.game_map
+
+        half_w = w // 2
+        half_h = h // 2
+
+        # Clamp viewport to map bounds
+        x0 = max(0, min(px - half_w, gm.width - w))
+        y0 = max(0, min(py - half_h, gm.height - h))
+        x1 = x0 + w
+        y1 = y0 + h
+
+        return x0, y0, x1, y1
+
 
     def render(self) -> Text:
         text = Text()
         gm = self.engine.game_map
-        # Get the map's string representation from GameMap.render()
-        map_rows = gm.render()
+        x0, y0, x1, y1 = self.get_viewport_bounds()
 
-        for y, row in enumerate(map_rows):
-            for x, char in enumerate(row):
-                # Check if there's an entity at this position
-                entity = next((e for e in self.engine.entities if e.x == x and e.y == y), None)
-                if entity:
-                    # Render entity character with its color
-                    text.append(entity.char, style=entity.color)
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                entity = next(
+                    (e for e in self.engine.entities if e.x == x and e.y == y),
+                    None,
+                )
+
+                if gm.is_visible(x, y):
+                    if entity:
+                        text.append(entity.char, style=entity.color)
+                    else:
+                        char = gm.render()[y][x]
+                        style = "white" if char == "." else "#FDF2C8"
+                        text.append(char, style=style)
+                elif gm.is_explored(x, y):
+                    if entity:
+                        text.append(entity.char, style="grey37")
+                    else:
+                        char = gm.render()[y][x]
+                        if char == "·":
+                            text.append(char, style="grey23")
+                        elif char == "▒":
+                            text.append(char, style="grey30")
+                        else:
+                            text.append(char, style="grey27")
                 else:
-                    # Render map tile ('.' for floor, '#' for wall)
-                    style = "white" if char == "." else "grey50"
-                    text.append(char, style=style)
+                    text.append(" ")
+
             text.append("\n")
 
         return text
-

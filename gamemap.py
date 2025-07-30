@@ -119,9 +119,9 @@ class GameMap:
                         row += "."
                 elif self.explored[y, x]:
                     if self.tiles[y, x] == 1:
-                        row += "▒"  # Light wall
+                        row += "▒"  # explored wall
                     else:
-                        row += "·"  # Dim floor
+                        row += "·"  # explored floor
                 else:
                     row += " "  # Unseen
             rows.append(row)

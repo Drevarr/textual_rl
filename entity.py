@@ -14,3 +14,4 @@ class Entity:
         self.x += dx
         self.y += dy
         self.facing = (dx, dy) if (dx, dy) != (0, 0) else self.facing
+

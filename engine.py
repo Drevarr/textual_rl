@@ -8,6 +8,8 @@ class Engine:
         self.player = player
         self.entities: list[Entity] = [player]
 
+        self.update_visibility()
+
     def add_entity(self, entity: Entity):
         self.entities.append(entity)
 
@@ -29,8 +31,13 @@ class Engine:
 
         if self.game_map.is_walkable(dest_x, dest_y):
             self.player.move(dx, dy)
+            self.update_visibility() 
             return "moved"
         else:
             return "blocked"
 
         return True
+
+    def update_visibility(self):
+        """Update the visible and explored tiles based on the player's current position."""
+        self.game_map.compute_fov(self.player.x, self.player.y, radius=8)

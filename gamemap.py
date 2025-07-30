@@ -47,6 +47,8 @@ class GameMap:
     def _transparent(self, x: int, y: int) -> bool:
         return 0 <= x < self.width and 0 <= y < self.height and self.tiles[y, x] == 0
 
+    def player_distance(self, x: int, y: int, px: int, py: int) -> int:
+        return max(abs(x - px), abs(y - py))  # Chebyshev (like shadowcasting octants)
 
     def compute_fov(self, x: int, y: int, radius: int = 8, light_walls=True):
         self.visible[:, :] = False  # Clear previous frame

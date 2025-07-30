@@ -57,6 +57,8 @@ class MapWidget(Static):
         text = Text()
         gm = self.engine.game_map
         x0, y0, x1, y1 = self.get_viewport_bounds()
+        px, py = self.engine.player.x, self.engine.player.y
+        rendered_rows = gm.render()
 
         for y in range(y0, y1):
             for x in range(x0, x1):
@@ -69,9 +71,19 @@ class MapWidget(Static):
                     if entity:
                         text.append(entity.char, style=entity.color)
                     else:
-                        char = gm.render()[y][x]
-                        style = "white" if char == "." else "#FDF2C8"
+                        dist = gm.player_distance(x, y, px, py)
+                        if dist <= 2:
+                            style = "#CC7621"
+                        elif dist <= 4:
+                            style = "#804A15"
+                        elif dist <= 6:
+                            style = "#4C2C0C"
+                        else:
+                            style = "#190F04"                        
+
+                        char = rendered_rows[y][x]
                         text.append(char, style=style)
+
                 elif gm.is_explored(x, y):
                     if entity:
                         text.append(entity.char, style="grey37")

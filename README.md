@@ -2,4 +2,4 @@
 2025 RogueLike Tutorial in Python with Textual and Rich
 
 
-![Screenshot of Tutorial Part3 current state](RL_Tutorial_pt4_initialFOV.png)
+![Screenshot of Tutorial Part4 current state](RL_Tutorial_pt4_initialFOV.png)

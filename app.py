@@ -20,8 +20,8 @@ class StatsPane(Static):
             f"Player Stats:\n"
             f"Name: {self.player.name}\n"
             f"Position: ({self.player.x}, {self.player.y})\n"
-            f"Health: 100\n"  # Replace with actual player health if available
-            f"Strength: 10"   # Replace with actual player stats if available
+            f"Health: {self.player.health}\n"  # Replace with actual player health if available
+            f"Strength: {self.player.strength}"   # Replace with actual player stats if available
         )
 
 

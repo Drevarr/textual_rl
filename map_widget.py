@@ -63,7 +63,7 @@ class MapWidget(Static):
         for y in range(y0, y1):
             for x in range(x0, x1):
                 entity = next(
-                    (e for e in self.engine.entities if e.x == x and e.y == y),
+                    (e for e in gm.entities if e.x == x and e.y == y),
                     None,
                 )
 
@@ -73,13 +73,13 @@ class MapWidget(Static):
                     else:
                         dist = gm.player_distance(x, y, px, py)
                         if dist <= 2:
-                            style = "#CC7621"
+                            style = "#D48E48"
                         elif dist <= 4:
-                            style = "#804A15"
+                            style = "#CC7621"
                         elif dist <= 6:
-                            style = "#4C2C0C"
+                            style = "#804A15"
                         else:
-                            style = "#190F04"                        
+                            style = "#4C2C0C"                        
 
                         char = rendered_rows[y][x]
                         text.append(char, style=style)
@@ -88,7 +88,7 @@ class MapWidget(Static):
                     if entity:
                         text.append(entity.char, style="grey37")
                     else:
-                        char = gm.render()[y][x]
+                        char = rendered_rows[y][x]
                         if char == "·":
                             text.append(char, style="grey23")
                         elif char == "▒":

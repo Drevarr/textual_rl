@@ -9,6 +9,9 @@ class Entity:
     char: str
     name: str
     color: str = "green"
+    max_hp: int = 100
+    hitpoints: int = 100
+    strength: int = 18
 
     def move(self, dx: int, dy: int):
         self.x += dx

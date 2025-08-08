@@ -2,11 +2,15 @@ import numpy as np
 import networkx as nx
 import random
 from textual import events
+from entity import Entity
 
 class GameMap:
-    def __init__(self, width: int, height: int):
+    def __init__(self, width: int, height: int, entities: list[Entity] = []):
         self.width = width
         self.height = height
+        self.centers = []
+        self.entities = entities
+        max_monsters_per_room = 2
 
         # 0 = floor, 1 = wall
         self.tiles = np.zeros((height, width), dtype=np.uint8)
@@ -20,6 +24,9 @@ class GameMap:
 
         self._build_graph()
 
+    def add_entity(self, entity: Entity):
+        self.entities.append(entity)
+        
     def _build_graph(self):
         self.graph = nx.grid_2d_graph(self.width, self.height)
         for x in range(self.width):
@@ -49,6 +56,40 @@ class GameMap:
 
     def player_distance(self, x: int, y: int, px: int, py: int) -> int:
         return max(abs(x - px), abs(y - py))  # Chebyshev (like shadowcasting octants)
+
+    def place_enemies(self, max_monsters_per_room=3):
+        # Define monsters: (name, char, color, weight)
+        monster_types = [
+            ("Goblin", "g", "green", 0.6),
+            ("Orc", "o", "green", 0.3),
+            ("Troll", "T", "red", 0.1),
+        ]
+
+        for i, room in enumerate(self.rooms):
+            if i == 0:
+                continue  # skip start room for player safety
+
+            num_monsters = random.randint(1, max_monsters_per_room)
+
+            for _ in range(num_monsters):
+                attempts = 0
+                while attempts < 20:  # avoid infinite retry
+                    attempts += 1
+
+                    # Pick random interior tile of room
+                    x = random.randint(room[0] + 1, room[0] + room[2] - 2)
+                    y = random.randint(room[1] + 1, room[1] + room[3] - 2)
+
+                    # Ensure walkable and no other entity here
+                    if self.walkable[y, x] and not any(e.x == x and e.y == y for e in self.entities):
+                        name, char, color, _ = random.choices(
+                            monster_types,
+                            weights=[m[3] for m in monster_types]
+                        )[0]
+
+                        enemy = Entity(x=x, y=y, char=char, name=name, color=color)
+                        self.add_entity(enemy)
+                        break
 
     def compute_fov(self, x: int, y: int, radius: int = 8, light_walls=True):
         self.visible[:, :] = False  # Clear previous frame
@@ -116,7 +157,7 @@ class GameMap:
             for x in range(self.width):
                 if self.visible[y, x]:
                     if self.tiles[y, x] == 1:
-                        row += "#"
+                        row += "▒"
                     else:
                         row += "."
                 elif self.explored[y, x]:
@@ -130,11 +171,11 @@ class GameMap:
         return rows
 
 
-    def generate_dungeon(self, room_attempts=30, min_size=5, max_size=10):
+    def generate_dungeon(self, room_attempts=30, min_size=5, max_size=10, max_monsters_per_room=2):
         self.tiles[:, :] = 1  # Start with all walls
         self.walkable[:, :] = False
         self.rooms = []
-        centers = []
+        self.centers = []
 
         for _ in range(room_attempts):
             w = random.randint(min_size, max_size)
@@ -150,23 +191,32 @@ class GameMap:
 
             self._carve_room(new_room)
             self.rooms.append(new_room)
-            centers.append((x + w // 2, y + h // 2))
+            self.centers.append((x + w // 2, y + h // 2))
 
         # Connect rooms using MST over centers
         g = nx.Graph()
-        for i, (x1, y1) in enumerate(centers):
-            for j, (x2, y2) in enumerate(centers):
+        for i, (x1, y1) in enumerate(self.centers):
+            for j, (x2, y2) in enumerate(self.centers):
                 if i < j:
                     dist = abs(x1 - x2) + abs(y1 - y2)
                     g.add_edge(i, j, weight=dist)
         mst = nx.minimum_spanning_tree(g)
 
         for i, j in mst.edges:
-            self._carve_corridor(centers[i], centers[j])
+            self._carve_corridor(self.centers[i], self.centers[j])
 
         # Update walkability and graph
         self.walkable = self.tiles == 0
         self._build_graph()
+
+        self.place_enemies(max_monsters_per_room)
+
+        # Return center of first room (start position)
+        if self.centers:
+            return self.centers[0]
+        else:
+            return (0, 0)  # fallback if no rooms
+        
 
     def _carve_room(self, room):
         x, y, w, h = room

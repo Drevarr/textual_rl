@@ -6,12 +6,12 @@ class Engine:
     def __init__(self, game_map: GameMap, player: Entity):
         self.game_map = game_map
         self.player = player
-        self.entities: list[Entity] = [player]
+        #self.entities: list[Entity] = [player]
 
         self.update_visibility()
 
-    def add_entity(self, entity: Entity):
-        self.entities.append(entity)
+    #def add_entity(self, entity: Entity):
+        #self.entities.append(entity)
 
     def handle_input(self, key: str) -> bool:
         dx, dy = 0, 0

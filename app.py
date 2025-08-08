@@ -20,7 +20,7 @@ class StatsPane(Static):
             f"Player Stats:\n"
             f"Name: {self.player.name}\n"
             f"Position: ({self.player.x}, {self.player.y})\n"
-            f"Health: {self.player.health}\n"  # Replace with actual player health if available
+            f"Health: {self.player.hitpoints}\n"  # Replace with actual player health if available
             f"Strength: {self.player.strength}"   # Replace with actual player stats if available
         )
 
@@ -74,11 +74,14 @@ class RoguelikeApp(App):
     """
     def compose(self) -> ComposeResult:
         game_map = GameMap(120, 30)
-        game_map.generate_dungeon()
-        player = Entity(x=20, y=8, char='@', name='Player', color='green')
-        enemy = Entity(x=15, y=11, char='E', name='Enemy', color='red')
+        centers = game_map.centers
+        start_x, start_y = game_map.generate_dungeon()
+        player = Entity(x=start_x, y=start_y, char='@', name='Player', color='green')
+        #player = Entity(x=20, y=8, char='@', name='Player', color='green')
+        #enemy = Entity(x=21, y=9, char='E', name='Enemy', color='red')
         engine = Engine(game_map, player)
-        engine.add_entity(enemy)
+        game_map.add_entity(player)
+        #game_map.add_entity(enemy)
         self.inventory = ["Sword", "Shield"]  # Example inventory
 
         yield Header(show_clock=True)
@@ -103,6 +106,7 @@ class RoguelikeApp(App):
             "loot": "yellow",
             "mouse": "cyan",
             "click": "magenta",
+            "info": "white",
         }.get(kind, "white")
         formatted = f"[dim]{timestamp}[/dim] [bold {color}]{message}[/bold {color}]"
         self.query_one(RichLog).write(formatted)
